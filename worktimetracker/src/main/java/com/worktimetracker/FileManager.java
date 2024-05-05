@@ -40,7 +40,7 @@ public class FileManager {
         }else{
             Path monthsFilePath = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Months\\"+file.get());
             BufferedWriter writer = new BufferedWriter(new FileWriter(monthsFilePath.toString(), true));
-            writer.append("$$"+end.toString("hh:mm:ss"));
+            writer.append("O"+end.toString("hh:mm:ss"));
             writer.flush();
             writer.close();
         }
@@ -53,7 +53,8 @@ public class FileManager {
         List<String> lines = Files.readAllLines(file);
         List<WorkSession> workSessions = new ArrayList<>();
         for (String line : lines) {
-            String[] parts = line.split("$$");
+            System.out.println(line);
+            String[] parts = line.split("O");
             if(parts.length == 2){
                 workSessions.add(new WorkSession(DateTime.fromString(parts[0], "YYYY-MM-DD hh:mm:ss"), Time.fromString(parts[1], "hh:mm:ss")));
             }
@@ -63,12 +64,13 @@ public class FileManager {
 
     private void createFolderIfNotExist() throws IOException, URISyntaxException{
         Path folder = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Months");
-        Files.createDirectory(folder);
+        Files.createDirectories(folder);
     }
 
     private Optional<String> getNewestFile() throws IOException, URISyntaxException   {
         createFolderIfNotExist();
         File folder = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Months").toFile();
+        System.out.println(folder.listFiles());
         return Stream.of(folder.listFiles())
             .sorted((arg0, arg1) -> {
                     //größer (1) heißt älter in der vergangenheit
