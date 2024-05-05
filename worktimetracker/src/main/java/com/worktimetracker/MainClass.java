@@ -1,14 +1,16 @@
 package com.worktimetracker;
 
-import java.io.File;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
-/**
- * Hello world!
- *
- */
+import com.worktimetracker.DataClasses.Date;
+import com.worktimetracker.DataClasses.DateTime;
+import com.worktimetracker.DataClasses.Time;
+import com.worktimetracker.DataClasses.WorkSession;
+
 public class MainClass 
 {
+    private static FileManager fileManager = new FileManager();
     public static void main( String[] args )
     {
         if(args.length < 1){
@@ -36,10 +38,19 @@ public class MainClass
     }
 
     private static void startTimer(){
+        try {
+            fileManager.storeStart(DateTime.now());
+        } catch (IOException | URISyntaxException e) {
+            System.out.println(e.getMessage());
+        }
 
     }
     private static void stopTimer(){
-
+        try {
+            fileManager.storeEnd(DateTime.now().time());
+        } catch (URISyntaxException | IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
     private static void displayMonth(){
 

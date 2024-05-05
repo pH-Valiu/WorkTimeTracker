@@ -22,6 +22,15 @@ public class Date implements Comparable<Date> {
         return new Date(Integer.valueOf(year), Integer.valueOf(month), Integer.valueOf(day));
     }
 
+    /*
+     * Is in format "YYYY-MM"
+     */    
+    public static Date fromYearMonthString(String date){
+        String month = date.substring(5, 7);
+        String year = date.substring(0, 4);
+        return new Date(Integer.valueOf(year), Integer.valueOf(month), 0);
+    }
+
     /**
      * DD for day, MM for month, YYYY for year
      * @param format

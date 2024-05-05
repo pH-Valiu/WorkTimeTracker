@@ -1,5 +1,7 @@
 package com.worktimetracker.DataClasses;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 public class Time extends Number implements Comparable<Time>{
     private final int hours;
@@ -9,6 +11,10 @@ public class Time extends Number implements Comparable<Time>{
     public int minutes(){return minutes;}
     public int seconds(){return seconds;}
     public Time(int hours, int minutes, int seconds){this.hours=hours; this.minutes=minutes; this.seconds=seconds;}
+    public static Time now(){
+        ZonedDateTime z = ZonedDateTime.now(ZoneId.systemDefault());
+        return new Time(z.getHour(), z.getMinute(), z.getSecond());
+    }
 
     /**
      * hh for hours, mm for minutes, ss for seconds
