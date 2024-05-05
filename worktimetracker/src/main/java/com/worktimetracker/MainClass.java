@@ -67,11 +67,22 @@ public class MainClass
     }
     private static void displayMonth(int maxHours){
         try {
-            List<WorkSession> sessions = fileManager.getSessionsOfMonth();
-            System.out.println(sessions);
-            Period periodTotal = sessions.stream().map( it -> it.getWorkTime()).reduce(new Period(0, 0, 0), (subtotal, element) -> subtotal.add(element));
-            System.out.println("Maximum this month:\t\t\t"+maxHours+"h");
-            System.out.println("Already worked:\t\t\t\t"+periodTotal.toString());
+            WorkMonth workMonth = new WorkMonth(fileManager.getSessionsOfMonth());
+            Period remainingWorkLoad = new Period(maxHours, 0, 0).minus(workMonth.getWorkedOffTotal());
+            System.out.println("\n-----------------------------------------"+ANSI_COLORS.ANSI_BLUE+"Work Time Tracker"+ANSI_COLORS.ANSI_RESET+"---------------------------------------\n");
+            System.out.println("Total work load for "+ ANSI_COLORS.ANSI_CYAN+DateTime.now().date().getMonthAsString()+ANSI_COLORS.ANSI_RESET+":\t\t\t"+ANSI_COLORS.ANSI_CYAN+maxHours+ANSI_COLORS.ANSI_RESET+"h");
+            System.out.println("Already worked off:\t\t\t\t"+workMonth.getWorkedOffTotal().toStringOrDash(ANSI_COLORS.ANSI_GREEN));
+            System.out.println("Still have to work off:\t\t\t\t"+remainingWorkLoad.toStringOrDash(ANSI_COLORS.ANSI_RED));
+            if(remainingWorkLoad.isZero()) System.out.println(ANSI_COLORS.ANSI_GREEN+"Monthly duties fulfilled. Relax!"+ANSI_COLORS.ANSI_RESET);
+            System.out.println("Weekly Distribution:");
+            System.out.println(workMonth.getDistributionForWorkedOffOfOptimalAsString(new Period(maxHours, 0, 0)));
+            System.out.println();
+            if(!remainingWorkLoad.isZero()){
+                System.out.println("Weekly distribution for remaining work:\t\t");
+                System.out.println(workMonth.getDistributionForRemainingDaysAsString(remainingWorkLoad));
+            }
+            System.out.println();
+            System.out.println("-------------------------------------------------------------------------------------------------");
         } catch (IOException | URISyntaxException e) {
             System.out.println(e.getMessage());
         }
