@@ -62,10 +62,17 @@ public class WorkMonth {
                 s += "    "+periodsPerWeek[i].toStringOrDash(ANSI_COLORS.ANSI_RED)+"\t|";
             }
         }
+        s += " <- "+ANSI_COLORS.ANSI_GREEN+"# Accomplished"+ANSI_COLORS.ANSI_RESET+", "+ANSI_COLORS.ANSI_RED+"# Missed"+ANSI_COLORS.ANSI_RESET;
         s += "\n";
         for (int i = 0; i < optWorkPerWeek.length; i++) {
-            s += " of "+optWorkPerWeek[i].toStringOrDash(ANSI_COLORS.ANSI_CYAN)+"\t|";
+            if (optWorkPerWeek[i].isZero()){
+                s += "    ";
+            }else{
+                s += " of ";
+            }
+            s += optWorkPerWeek[i].toStringOrDash(ANSI_COLORS.ANSI_CYAN)+"\t|";
         }
+        s += ANSI_COLORS.ANSI_CYAN+" <- Optimal Distribution"+ANSI_COLORS.ANSI_RESET;
         return s;
     }
 

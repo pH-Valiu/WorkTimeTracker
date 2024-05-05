@@ -2,7 +2,6 @@ package com.worktimetracker;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
 
 import com.worktimetracker.DataClasses.*;
 
@@ -87,6 +86,7 @@ public class MainClass
             System.out.println(e.getMessage());
         }
     }
+
     private static void displayWeek(int maxHours){
 
     }
