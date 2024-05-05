@@ -3,10 +3,7 @@ package com.worktimetracker;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import com.worktimetracker.DataClasses.Date;
 import com.worktimetracker.DataClasses.DateTime;
-import com.worktimetracker.DataClasses.Time;
-import com.worktimetracker.DataClasses.WorkSession;
 
 public class MainClass 
 {

@@ -1,18 +1,24 @@
 package com.worktimetracker;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.worktimetracker.DataClasses.Date;
 import com.worktimetracker.DataClasses.DateTime;
 import com.worktimetracker.DataClasses.Time;
+import com.worktimetracker.DataClasses.WorkSession;
 
 public class FileManager {
     
@@ -22,7 +28,7 @@ public class FileManager {
         Path monthsFilePath = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Months\\"+fileName);
         BufferedWriter writer = new BufferedWriter(new FileWriter(monthsFilePath.toString(), true));
         writer.newLine();
-        writer.append("[RUNNING]"+starDateTime.toString());
+        writer.append(starDateTime.toString("YYYY-MM-DD hh:mm:ss"));
         writer.flush();
         writer.close();
     }
@@ -34,10 +40,25 @@ public class FileManager {
         }else{
             Path monthsFilePath = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Months\\"+file.get());
             BufferedWriter writer = new BufferedWriter(new FileWriter(monthsFilePath.toString(), true));
-            writer.append("-"+end.toString());
+            writer.append("$$"+end.toString("hh:mm:ss"));
             writer.flush();
             writer.close();
         }
+    }
+
+    public List<WorkSession> getSessionsOfMonth() throws IOException, URISyntaxException{
+        createFolderIfNotExist();
+        String fileName = DateTime.now().toString("YYYY-MM");
+        Path file = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Months\\"+fileName);
+        List<String> lines = Files.readAllLines(file);
+        List<WorkSession> workSessions = new ArrayList<>();
+        for (String line : lines) {
+            String[] parts = line.split("$$");
+            if(parts.length == 2){
+                workSessions.add(new WorkSession(DateTime.fromString(parts[0], "YYYY-MM-DD hh:mm:ss"), Time.fromString(parts[1], "hh:mm:ss")));
+            }
+        }
+        return workSessions;
     }
 
     private void createFolderIfNotExist() throws IOException, URISyntaxException{
@@ -46,6 +67,7 @@ public class FileManager {
     }
 
     private Optional<String> getNewestFile() throws IOException, URISyntaxException   {
+        createFolderIfNotExist();
         File folder = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Months").toFile();
         return Stream.of(folder.listFiles())
             .sorted((arg0, arg1) -> {
