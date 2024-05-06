@@ -1,5 +1,6 @@
+```
 Commands available:
-  help:                Shows the help page
+  help:    		         Shows the help page
   start:               Starts the time tracking
   stop:                Stops the time tracking
   month <maxHours>     Displays the stats of the current month. You can optionally specify the needed amount of worked hours (default is 40). 
