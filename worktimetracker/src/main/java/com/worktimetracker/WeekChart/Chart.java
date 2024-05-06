@@ -15,11 +15,7 @@ public class Chart {
         table = new TimeSlot[daysOfSelectedWeek.size()][24];
         for (int i = 0; i < table.length; i++) {
             for (int j = 0; j < table[i].length; j++) {
-                table[i][j] = new TimeSlot(
-                    daysOfSelectedWeek.get(i).first(), 
-                    daysOfSelectedWeek.get(i).second(), 
-                    j
-                );
+                table[i][j] = new TimeSlot();
             }
         }
     }

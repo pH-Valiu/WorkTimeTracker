@@ -103,6 +103,7 @@ public class MainClass
             System.out.println("Daily Distribution:");
             //System.out.println(workWeek.getDistributionForWorkedOffOfOptimalAsString(new Period(maxHours, 0, 0)));
             System.out.println(workWeek.getDistributionChart());
+            System.out.println();
             System.out.println(workWeek.getDistributionForWorkedOffOfOptimalAsString(new Period(maxHours, 0, 0)));
             System.out.println();
             if(!remainingWorkLoad.isZero()){

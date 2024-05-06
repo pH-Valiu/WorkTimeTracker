@@ -56,7 +56,7 @@ public class WorkWeek extends AbstractWorkCalendarFrame {
     public String getDistributionForWorkedOffOfOptimalAsString(Period totalWorkLoad) {
         Period[] workedOffPerDay = getDistributionForWorkedOff();
         Period[] optWorkPerDay = getOptimalDistributionForWorkLoad(totalWorkLoad);
-        String s = "\t   1.       |\t      2.        |         3.        |         4.        |         5.\t    |\t      6.        |         7.        |\n";
+        String s = "         Mon.       |        Tue.       |        Wed.       |        Thu.       |        Fri.       |        Sat.       |        Sun.       |\n";
 
         //create string with green: accomplished, red: missed
         s+= " ";
@@ -77,11 +77,22 @@ public class WorkWeek extends AbstractWorkCalendarFrame {
 
     public String getDistributionChart(){
         Chart chart = new Chart(daysOfWeekList);
+        String s = "";
+        s += "───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n";
         for (WorkSession workSession : mapSessionToWeek.keySet()) {
             chart.addPeriod(workSession.start(), Period.getPeriod(workSession.start().time(), workSession.end()));
         }
 
-        return chart.toString();
+        s += chart.toString();
+        s += "  ";
+        for (int i = 0; i < daysOfWeekList.size(); i++) {
+            DateTime now = DateTime.now();
+            Date date = new Date(now.date().year(), now.date().month(), daysOfWeekList.get(i).first());
+            s += "       "+date.getDayOfWeekAsString()+".         ";
+        }
+        s += "\n";
+        s += "───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n";
+        return s;
     }
 
 
