@@ -34,23 +34,19 @@ public record Period(int hours, int minutes, int seconds) implements Comparable<
      * @return the addition object
      */
     public Period add(Period other){
-        int hours = this.hours;
-        int minutes = this.minutes;
-        int seconds = this.seconds;
+        int seconds = this.seconds + other.seconds;
+        int minutes = this.minutes + other.minutes;
+        int hours = this.hours + other.hours;
 
-        seconds += other.seconds;
         if(seconds >= 60){
-            seconds = 0;
-            minutes--;
+            seconds = seconds - 60;
+            minutes++;
         }
 
-        minutes += other.minutes;
         if(minutes >= 60){
-            minutes = 0;
+            minutes = minutes - 60;
             hours++;
         }
-
-        hours += other.hours;
 
         return new Period(hours, minutes, seconds);
     }
@@ -154,5 +150,9 @@ public record Period(int hours, int minutes, int seconds) implements Comparable<
             }
         }
     }
-    
+  
+    @Override
+    public int hashCode(){
+        return (hours * 3600) + (minutes * 60) + (seconds);
+    }
 }

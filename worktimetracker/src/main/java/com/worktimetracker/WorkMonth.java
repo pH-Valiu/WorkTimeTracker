@@ -14,8 +14,9 @@ public class WorkMonth {
     public WorkMonth(List<WorkSession> sessions){
         this.sessions = sessions;
         this.mapSessionToWeek = new HashMap<>();
+        //fill map <session - weekNr>
         for (WorkSession workSession : sessions) {
-            mapSessionToWeek.put(workSession, calculateWeekBasedOnWeekAndMonth(
+            mapSessionToWeek.put(workSession, calculateWeekNrBasedOnWeekAndMonth(
                     workSession.start().date().getDayOfWeek(), 
                     workSession.start().date().day()));
         }
@@ -27,52 +28,72 @@ public class WorkMonth {
     private Map<WorkSession, Integer> mapSessionToWeek;
 
 
+    /**
+     * Calculate the total period already worked off
+     * @return
+     */
     public Period getWorkedOffTotal(){
         return sessions.stream().map( it -> it.getWorkTime()).reduce(new Period(0, 0, 0), (subtotal, element) -> subtotal.add(element));
     }
 
+    /**
+     * Calculate the total period already worked off based on the week
+     * @param weekNr
+     * @return
+     */
+    public Period getWorkedOffByWeek(int weekNr){
+        List<WorkSession> sessionsOfWeek = mapSessionToWeek.entrySet().stream()
+                .filter((entry) -> entry.getValue().equals(weekNr))
+                .map((entry) -> entry.getKey())
+                .toList();
+        return sessionsOfWeek.stream().map( it -> it.getWorkTime()).reduce(new Period(0, 0, 0), (subtotal, element) -> subtotal.add(element));
+    }
+
+    /**
+     * Calculate the distribution for already worked off labour in each week
+     * @return
+     */
     public Period[] getDistributionForWorkedOff(){
-        //array to store the periods 
+        //pre-create the array
         Period[] workLoadPerWeek = new Period[]{
             new Period(0,0,0),new Period(0,0,0),
             new Period(0,0,0),new Period(0,0,0),
             new Period(0,0,0),new Period(0,0,0)
         };
 
+        // Fill the array
         for (int i = 0; i < workLoadPerWeek.length; i++) {
-            final int j = i;
-            List<WorkSession> sessionsOfWeek = mapSessionToWeek.entrySet().stream()
-                .filter((entry) -> entry.getValue().equals((j+1)))
-                .map((entry) -> entry.getKey())
-                .toList();
-            workLoadPerWeek[i] = sessionsOfWeek.stream().map( it -> it.getWorkTime()).reduce(new Period(0, 0, 0), (subtotal, element) -> subtotal.add(element));
+            workLoadPerWeek[i] = getWorkedOffByWeek(i+1);
         }
 
+        //return array
         return workLoadPerWeek;
     }
 
-    public String getDistributionForWorkedOffOfOptimalAsString(Period remainingWorkLoad){
+    /**
+     * Calculate and create string depiciting the distribution for already worked off labour each week.
+     * And how it correlates to the optimal distribution of the total work load
+     * @param totalWorkLoad
+     * @return
+     */
+    public String getDistributionForWorkedOffOfOptimalAsString(Period totalWorkLoad){
         Period[] periodsPerWeek = getDistributionForWorkedOff();
-        Period[] optWorkPerWeek = getOptimalDistributionForMonth(remainingWorkLoad);
+        Period[] optWorkPerWeek = getOptimalDistributionForMonth(totalWorkLoad);
         String s = "\t1.\t|\t2.\t|\t3.\t|\t4.\t|\t5\t|\t6\t|\n";
+
+        //create string with green: accomplished, red: missed
         for (int i = 0; i < periodsPerWeek.length; i++) {
             if(periodsPerWeek[i].compareTo(optWorkPerWeek[i]) >= 0){
-                s += "    "+periodsPerWeek[i].toStringOrDash(ANSI_COLORS.ANSI_GREEN)+"\t|";
+                s += "    " + periodsPerWeek[i].toStringOrDash(ANSI_COLORS.ANSI_GREEN) + "\t|";
             }else{
-                s += "    "+periodsPerWeek[i].toStringOrDash(ANSI_COLORS.ANSI_RED)+"\t|";
+                s += "    " + periodsPerWeek[i].toStringOrDash(ANSI_COLORS.ANSI_RED)   + "\t|";
             }
         }
         s += " <- "+ANSI_COLORS.ANSI_GREEN+"# Accomplished"+ANSI_COLORS.ANSI_RESET+", "+ANSI_COLORS.ANSI_RED+"# Missed"+ANSI_COLORS.ANSI_RESET;
         s += "\n";
-        for (int i = 0; i < optWorkPerWeek.length; i++) {
-            if (optWorkPerWeek[i].isZero()){
-                s += "    ";
-            }else{
-                s += " of ";
-            }
-            s += optWorkPerWeek[i].toStringOrDash(ANSI_COLORS.ANSI_CYAN)+"\t|";
-        }
-        s += ANSI_COLORS.ANSI_CYAN+" <- Optimal Distribution"+ANSI_COLORS.ANSI_RESET;
+        
+        //add the optimal distribution
+        s += getOptimalDistributionAddonForMonthAsString(totalWorkLoad);
         return s;
     }
 
@@ -102,7 +123,7 @@ public class WorkMonth {
             Date date = new Date(now.year(), now.month(), i);
 
             //get the week number based on the days
-            int weekNumber = calculateWeekBasedOnWeekAndMonth(date.getDayOfWeek(), date.day());
+            int weekNumber = calculateWeekNrBasedOnWeekAndMonth(date.getDayOfWeek(), date.day());
             
             //add the per day workload to the corresponding week
             workLoadPerWeek[(weekNumber - 1)] = workLoadPerWeek[(weekNumber - 1)].add(workLoadPerDay);
@@ -121,7 +142,7 @@ public class WorkMonth {
         return s;
     }
 
-    private int calculateWeekBasedOnWeekAndMonth(int weekDay, int monthDay){
+    private int calculateWeekNrBasedOnWeekAndMonth(int weekDay, int monthDay){
         return (int) Math.ceil((monthDay - weekDay) / 7.0) + 1;
     }
 
@@ -142,15 +163,16 @@ public class WorkMonth {
         };
 
         //loop for each reamining day where i is the day
-        for (int i = 0; i < totalDays; i++) {
+        for (int i = 1; i <= totalDays; i++) {
             Date date = new Date(now.year(), now.month(), i);
 
             //get the week number based on the days
-            int weekNumber = calculateWeekBasedOnWeekAndMonth(date.getDayOfWeek(), date.day());
+            int weekNumber = calculateWeekNrBasedOnWeekAndMonth(date.getDayOfWeek(), date.day());
             
             //add the per day workload to the corresponding week
             workLoadPerWeek[(weekNumber - 1)] = workLoadPerWeek[(weekNumber - 1)].add(workLoadPerDay);
         }
+
 
         //return array
         return workLoadPerWeek;
@@ -160,8 +182,14 @@ public class WorkMonth {
         Period[] optimalWorkLoadPerWeek = getOptimalDistributionForMonth(totalWorkLoad);
         String s = "";
         for (int i = 0; i < optimalWorkLoadPerWeek.length; i++) {
-            s += " of "+optimalWorkLoadPerWeek[i].toStringOrDash(ANSI_COLORS.ANSI_CYAN)+"\t|";
+            if (optimalWorkLoadPerWeek[i].isZero()){
+                s += "    ";
+            }else{
+                s += " of ";
+            }
+            s += optimalWorkLoadPerWeek[i].toStringOrDash(ANSI_COLORS.ANSI_CYAN)+"\t|";
         }
+        s += ANSI_COLORS.ANSI_CYAN+" <- Optimal Distribution"+ANSI_COLORS.ANSI_RESET;
         return s;
     }
 
