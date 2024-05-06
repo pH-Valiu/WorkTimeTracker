@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import com.worktimetracker.DataClasses.*;
+import com.worktimetracker.WorkCalendar.*;
 
 public class MainClass 
 {
@@ -67,7 +68,7 @@ public class MainClass
     private static void displayMonth(int maxHours){
         try {
             WorkMonth workMonth = new WorkMonth(fileManager.getSessionsOfMonth());
-            Period remainingWorkLoad = new Period(maxHours, 0, 0).minus(workMonth.getWorkedOffTotal());
+            Period remainingWorkLoad = new Period(maxHours, 0, 0).minusWithLowerEnd(workMonth.getWorkedOffTotal());
             System.out.println("\n-----------------------------------------"+ANSI_COLORS.ANSI_BLUE+"Work Time Tracker"+ANSI_COLORS.ANSI_RESET+"---------------------------------------\n");
             System.out.println("Total work load for "+ ANSI_COLORS.ANSI_CYAN+DateTime.now().date().getMonthAsString()+ANSI_COLORS.ANSI_RESET+":\t\t\t"+ANSI_COLORS.ANSI_CYAN+maxHours+ANSI_COLORS.ANSI_RESET+"h");
             System.out.println("Already worked off:\t\t\t\t"+workMonth.getWorkedOffTotal().toStringOrDash(ANSI_COLORS.ANSI_GREEN));
@@ -78,9 +79,9 @@ public class MainClass
             System.out.println();
             if(!remainingWorkLoad.isZero()){
                 System.out.println("Weekly distribution for remaining work:\t\t");
-                System.out.println(workMonth.getDistributionForRemainingDaysAsString(remainingWorkLoad));
+                System.out.println(workMonth.getDistributionForRemainingWorkLoadAsString(remainingWorkLoad));
+                System.out.println();
             }
-            System.out.println();
             System.out.println("-------------------------------------------------------------------------------------------------");
         } catch (IOException | URISyntaxException e) {
             System.out.println(e.getMessage());
@@ -88,6 +89,30 @@ public class MainClass
     }
 
     private static void displayWeek(int maxHours){
-
+        try{
+            DateTime now = DateTime.now();
+            int weekNr = WorkMonth.calculateWeekNrBasedOnWeekAndMonth(now.date().getDayOfWeek(), now.date().day());
+            
+            WorkWeek workWeek = new WorkWeek(fileManager.getSessionsOfMonth(), weekNr);
+            Period remainingWorkLoad = new Period(maxHours, 0, 0).minusWithLowerEnd(workWeek.getWorkedOffByWeek(weekNr));
+            System.out.println("\n-----------------------------------------"+ANSI_COLORS.ANSI_BLUE+"Work Time Tracker"+ANSI_COLORS.ANSI_RESET+"---------------------------------------\n");
+            System.out.println("Total work load for "+ ANSI_COLORS.ANSI_CYAN+now.date().getMonthAsString()+ANSI_COLORS.ANSI_RESET+", Week "+ANSI_COLORS.ANSI_CYAN + weekNr + ANSI_COLORS.ANSI_RESET+":\t\t"+ANSI_COLORS.ANSI_CYAN+maxHours+ANSI_COLORS.ANSI_RESET+"h");
+            System.out.println("Already worked off:\t\t\t\t"+workWeek.getWorkedOffByWeek(weekNr).toStringOrDash(ANSI_COLORS.ANSI_GREEN));
+            System.out.println("Still have to work off:\t\t\t\t"+remainingWorkLoad.toStringOrDash(ANSI_COLORS.ANSI_RED));
+            if(remainingWorkLoad.isZero()) System.out.println(ANSI_COLORS.ANSI_GREEN+"Weekly duties fulfilled. Relax!"+ANSI_COLORS.ANSI_RESET);
+            System.out.println("Daily Distribution:");
+            //System.out.println(workWeek.getDistributionForWorkedOffOfOptimalAsString(new Period(maxHours, 0, 0)));
+            System.out.println(workWeek.getDistributionChart());
+            System.out.println(workWeek.getDistributionForWorkedOffOfOptimalAsString(new Period(maxHours, 0, 0)));
+            System.out.println();
+            if(!remainingWorkLoad.isZero()){
+                System.out.println("Daily distribution for remaining work:\t\t");
+                System.out.println(workWeek.getDistributionForRemainingWorkLoadAsString(remainingWorkLoad));
+            }
+            System.out.println();
+            System.out.println("-------------------------------------------------------------------------------------------------");
+        }catch (IOException | URISyntaxException e){
+            System.out.println(e.getMessage());
+        }
     }
 }

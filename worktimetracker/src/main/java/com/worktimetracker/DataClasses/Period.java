@@ -28,6 +28,18 @@ public record Period(int hours, int minutes, int seconds) implements Comparable<
         return new Period(hours, minutes, seconds);
     }
 
+
+    /**
+     * Static constructor to get Period object from total seconds count
+     * @param totalSeconds
+     * @return
+     */
+    public static Period fromSeconds(long totalSeconds){
+        int hoursFraction = (int) ( totalSeconds / 3600 );
+        int minutesFraction = (int) ( totalSeconds - ( hoursFraction * 3600 ) ) / 60;
+        int secondsFraction = (int) ( totalSeconds - ( hoursFraction * 3600 ) - ( minutesFraction * 60) );
+        return new Period(hoursFraction, minutesFraction, secondsFraction);
+    }
     /**
      * Adds another period object to this one and returns the addition of both as a new period object
      * @param other
@@ -52,44 +64,42 @@ public record Period(int hours, int minutes, int seconds) implements Comparable<
     }
 
     /**
-     * Subtracts another period object to this one and returns the subtraction of both as a new period object
+     * Subtracts another period object to this one and returns the subtraction of both as a new period object.
+     * It always returns sth > 0
      * @param other
      * @return the subtraction object
      */
     public Period minus(Period other){
-        int hours = this.hours - other.hours;
-        int minutes = this.minutes - other.minutes;
-        int seconds = this.seconds - other.seconds;
+        int h1 = this.hashCode();
+        int h2 = other.hashCode();
+        int res;
+        if (h1 > h2){
+            res = h1 - h2;
+        }else{
+            res = h2 - h1;
+        }
 
-        if(seconds < 0){
-            seconds = 60 + seconds;
-            minutes--;
+        return Period.fromSeconds(res);
+    }
+
+    /**
+     * Subtract from another but it can't go smaller than zero
+     * @param other
+     * @return
+     */
+    public Period minusWithLowerEnd(Period other){
+        long res = this.hashCode() - other.hashCode();
+        if (res < 0){
+            res = 0;
         }
-        if(minutes < 0){
-            minutes = 60 + minutes;
-            hours --;
-        }
-        if(hours < 0){
-            hours = 0;
-            minutes = 0;
-            seconds = 0;
-        }
-        return new Period(hours, minutes, seconds);
+
+        return Period.fromSeconds(res);
     }
 
     public Period divideBy(int divisor){
-        //period to seconds
-        long totalSeconds = seconds;
-        totalSeconds += 60 * minutes;
-        totalSeconds += 3600 * hours;
+        long totalSecondsFraction = this.hashCode() / divisor;
 
-        long totalSecondsFraction = totalSeconds / divisor;
-
-        int hoursFraction = (int) ( totalSecondsFraction / 3600 );
-        int minutesFraction = (int) ( totalSecondsFraction - ( hoursFraction * 3600 ) ) / 60;
-        int secondsFraction = (int) ( totalSecondsFraction - ( hoursFraction * 3600 ) - ( minutesFraction * 60) );
-
-        return new Period(hoursFraction, minutesFraction, secondsFraction);
+        return Period.fromSeconds(totalSecondsFraction);
     }
 
     public boolean isZero(){

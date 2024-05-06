@@ -156,6 +156,7 @@ public class Time extends Number implements Comparable<Time>{
         return new Time(newHours, newMinutes, newSeconds);
     }
 
+
     public Time plusTime(Time other){
         return this.plusTime(other.hours, other.minutes, other.seconds);
     }

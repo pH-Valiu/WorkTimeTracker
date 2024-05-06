@@ -11,6 +11,11 @@ public class DateTime implements Comparable<DateTime>{
     public DateTime(int year, int month, int day, int hours, int minutes, int seconds){
         this(new Date(year, month, day), new Time(hours, minutes, seconds));
     }
+    public DateTime(DateTime dateTime){
+        this(
+            dateTime.date.year(), dateTime.date.month(), dateTime.date.day(),
+            dateTime.time.hours(), dateTime.time.minutes(), dateTime.time.seconds());
+    }
     
     /**
      * hh for hours, mm for minutes, ss for seconds
@@ -58,6 +63,47 @@ public class DateTime implements Comparable<DateTime>{
         }else{
             return this.date.compareTo(o.date);
         }
+    }
+
+    public DateTime addPeriod(Period p){
+        int seconds = time.seconds();
+        int minutes = time.minutes();
+        int hours = time.hours();
+        int day = date.day();
+        int month = date.month();
+        int year = date.year();
+
+        seconds += p.seconds();
+        if(seconds >= 60){
+            seconds = seconds - 60;
+            minutes++;
+        }
+
+        minutes += p.minutes();
+        if(minutes >= 60){
+            minutes = minutes - 60;
+            hours++;
+        }
+
+        hours += p.hours();
+
+        while(hours >= 24){
+            hours = hours - 24;
+
+            day++;
+        }
+
+        while(day > new Date(year, month, day).getTotalDaysOfMonth()){
+            day = day - new Date(year, month, day).getTotalDaysOfMonth();
+            month++;
+
+            if(month > 12){
+                month = month - 12;
+                year++;
+            }
+        }
+
+        return new DateTime(year, month, day, hours, minutes, seconds);
     }
 
     
