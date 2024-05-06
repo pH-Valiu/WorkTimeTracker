@@ -67,7 +67,6 @@ public class WorkWeek extends AbstractWorkCalendarFrame {
                 s += "     " + workedOffPerDay[i].toStringOrDash(ANSI_COLORS.ANSI_RED)   + "     |";
             }
         }
-        s += " <- "+ANSI_COLORS.ANSI_GREEN+"# Accomplished"+ANSI_COLORS.ANSI_RESET+", "+ANSI_COLORS.ANSI_RED+"# Missed"+ANSI_COLORS.ANSI_RESET;
         s += "\n";
         
         //add the optimal distribution
@@ -108,7 +107,6 @@ public class WorkWeek extends AbstractWorkCalendarFrame {
             }
             s += optimalWorkLoadPerDay[i].toStringOrDash(ANSI_COLORS.ANSI_CYAN)+"     |";
         }
-        s += ANSI_COLORS.ANSI_CYAN+" <- Optimal Distribution"+ANSI_COLORS.ANSI_RESET;
         return s;    
     }
 
