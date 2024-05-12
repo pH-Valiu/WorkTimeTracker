@@ -144,8 +144,8 @@ public class WorkWeek extends AbstractWorkCalendarFrame {
         int dayOfMonth = now.day();
         int dayOfWeek = now.getDayOfWeek();
         
-        //calculate the remaining days (and current day (+1))
-        int remainingDays = daysOfWeekList.size() - daysOfWeekList.indexOf(new Pair<>(dayOfMonth, dayOfWeek)) - 1;
+        //calculate the remaining days (and current day (+1) (intrinsic due to index))
+        int remainingDays = daysOfWeekList.size() - daysOfWeekList.indexOf(new Pair<>(dayOfMonth, dayOfWeek));
 
         //calculate work load per day by dividing the total work load with the #days left
         Period workLoadPerDay = remainingWorkLoad.divideBy(remainingDays);
