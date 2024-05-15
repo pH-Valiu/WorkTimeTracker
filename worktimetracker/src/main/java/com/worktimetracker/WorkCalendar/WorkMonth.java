@@ -4,14 +4,13 @@ import java.util.List;
 
 import com.worktimetracker.ANSI_COLORS;
 import com.worktimetracker.DataClasses.Date;
-import com.worktimetracker.DataClasses.DateTime;
 import com.worktimetracker.DataClasses.Period;
 import com.worktimetracker.DataClasses.WorkSession;
 
 public class WorkMonth extends AbstractWorkCalendarFrame{
 
-    public WorkMonth(List<WorkSession> sessions){
-        super(sessions);
+    public WorkMonth(List<WorkSession> sessions, Date date){
+        super(sessions, date);
     }
     
 
@@ -82,10 +81,9 @@ public class WorkMonth extends AbstractWorkCalendarFrame{
      */
     @Override
     public Period[] getDistributionForRemainingWorkLoad(Period workLoad){
-        Date now = DateTime.now().date();
         
         //calculate the remaining days (and current day (+1))
-        int remainingDays = now.getTotalDaysOfMonth() - now.day() + 1;
+        int remainingDays = this.date.getTotalDaysOfMonth() - this.date.day() + 1;
 
         //calculate work load per day by dividing the total work load with the #days left
         Period workLoadPerDay = workLoad.divideBy(remainingDays);
@@ -98,11 +96,11 @@ public class WorkMonth extends AbstractWorkCalendarFrame{
         };
 
         //loop for each reamining day where i is the day
-        for (int i = now.day(); i < (now.day() + remainingDays); i++) {
-            Date date = new Date(now.year(), now.month(), i);
+        for (int i = this.date.day(); i < (this.date.day() + remainingDays); i++) {
+            Date dateI = new Date(this.date.year(), this.date.month(), i);
 
             //get the week number based on the days
-            int weekNumber = calculateWeekNrBasedOnWeekAndMonth(date.getDayOfWeek(), date.day());
+            int weekNumber = calculateWeekNrBasedOnWeekAndMonth(dateI.getDayOfWeek(), dateI.day());
             
             //add the per day workload to the corresponding week
             workLoadPerWeek[(weekNumber - 1)] = workLoadPerWeek[(weekNumber - 1)].add(workLoadPerDay);
@@ -124,10 +122,9 @@ public class WorkMonth extends AbstractWorkCalendarFrame{
 
     @Override
     public Period[] getOptimalDistributionForWorkLoad(Period totalWorkLoad){
-        Date now = DateTime.now().date();
 
         //calculate the total days 
-        int totalDays = now.getTotalDaysOfMonth();
+        int totalDays = this.date.getTotalDaysOfMonth();
 
         //calculate work load per day by dividing the total work load with the #days left
         Period workLoadPerDay = totalWorkLoad.divideBy(totalDays);
@@ -141,10 +138,10 @@ public class WorkMonth extends AbstractWorkCalendarFrame{
 
         //loop for each reamining day where i is the day
         for (int i = 1; i <= totalDays; i++) {
-            Date date = new Date(now.year(), now.month(), i);
+            Date dateI = new Date(this.date.year(), this.date.month(), i);
 
             //get the week number based on the days
-            int weekNumber = calculateWeekNrBasedOnWeekAndMonth(date.getDayOfWeek(), date.day());
+            int weekNumber = calculateWeekNrBasedOnWeekAndMonth(dateI.getDayOfWeek(), dateI.day());
             
             //add the per day workload to the corresponding week
             workLoadPerWeek[(weekNumber - 1)] = workLoadPerWeek[(weekNumber - 1)].add(workLoadPerDay);

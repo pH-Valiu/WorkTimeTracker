@@ -13,18 +13,16 @@ public class WorkWeek extends AbstractWorkCalendarFrame {
     //mapping between dayOfMonth --> dayOfWeek (e.g. 23. <-> 2.    meaning 23rd is a tuesday)
     private final List<Pair<Integer, Integer>> daysOfWeekList;
 
-    public WorkWeek(List<WorkSession> sessions, int weekNr){
-        super(sessions);
+    public WorkWeek(List<WorkSession> sessions, int weekNr, Date date){
+        super(sessions, date);
         this.weekNr = weekNr;
         
-        DateTime now = DateTime.now();
         daysOfWeekList = new ArrayList<>();
         boolean weekFound = false;
-        for (int i = 1; i <= now.date().getTotalDaysOfMonth(); i++) {
-            Date day = new Date(now.date().year(), now.date().month(), i);
-            int dayOfWeek = day.getDayOfWeek();
-            if (calculateWeekNrBasedOnWeekAndMonth(dayOfWeek, day.day()) == weekNr){
-                daysOfWeekList.add(new Pair<>(i, dayOfWeek));
+        for (int i = 1; i <= date.getTotalDaysOfMonth(); i++) {
+            Date day = new Date(date.year(), date.month(), i);
+            if (calculateWeekNrBasedOnWeekAndMonth(day.getDayOfWeek(), day.day()) == weekNr){
+                daysOfWeekList.add(new Pair<>(i, day.getDayOfWeek()));
                 weekFound = true;
             }else if(weekFound){
                 break;
@@ -85,9 +83,8 @@ public class WorkWeek extends AbstractWorkCalendarFrame {
         s += chart.toString();
         s += "  ";
         for (int i = 0; i < daysOfWeekList.size(); i++) {
-            DateTime now = DateTime.now();
-            Date date = new Date(now.date().year(), now.date().month(), daysOfWeekList.get(i).first());
-            s += "       "+date.getDayOfWeekAsString()+".         ";
+            Date dateI = new Date(date.year(), date.month(), daysOfWeekList.get(i).first());
+            s += "       "+dateI.getDayOfWeekAsString()+".         ";
         }
         s += "\n";
         s += "───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n";
@@ -112,6 +109,7 @@ public class WorkWeek extends AbstractWorkCalendarFrame {
 
     @Override
     protected Period[] getOptimalDistributionForWorkLoad(Period totalWorkLoad) {
+        if(daysOfWeekList.isEmpty()) throw new IllegalArgumentException("Week contains no days");
         Period perDayWorkLoad = totalWorkLoad.divideBy(daysOfWeekList.size());
         Period[] workLoadPerDay = new Period[]{
             new Period(0,0,0), new Period(0,0,0), new Period(0,0,0),
@@ -140,12 +138,12 @@ public class WorkWeek extends AbstractWorkCalendarFrame {
 
     @Override
     protected Period[] getDistributionForRemainingWorkLoad(Period remainingWorkLoad) {
-        Date now = DateTime.now().date();
-        int dayOfMonth = now.day();
-        int dayOfWeek = now.getDayOfWeek();
+        int dayOfMonth = date.day();
+        int dayOfWeek = date.getDayOfWeek();
         
         //calculate the remaining days (and current day (+1) (intrinsic due to index))
         int remainingDays = daysOfWeekList.size() - daysOfWeekList.indexOf(new Pair<>(dayOfMonth, dayOfWeek));
+        System.out.println("remaining Days: "+ remainingDays);
 
         //calculate work load per day by dividing the total work load with the #days left
         Period workLoadPerDay = remainingWorkLoad.divideBy(remainingDays);
@@ -159,13 +157,13 @@ public class WorkWeek extends AbstractWorkCalendarFrame {
         };
 
         //loop for each reamining day where i is the day
-        for (int i = now.day(); i < (now.day() + remainingDays); i++) {
-            Date date = new Date(now.year(), now.month(), i);
+        for (int i = date.day(); i < (date.day() + remainingDays); i++) {
+            Date dateI = new Date(date.year(), date.month(), i);
 
             //get the week number based on the days
             
             //add the per day workload to the corresponding week
-            workLoadPerWeek[date.getDayOfWeek()-1] = workLoadPerWeek[date.getDayOfWeek()-1].add(workLoadPerDay);
+            workLoadPerWeek[dateI.getDayOfWeek()-1] = workLoadPerWeek[dateI.getDayOfWeek()-1].add(workLoadPerDay);
         }
 
         //return array

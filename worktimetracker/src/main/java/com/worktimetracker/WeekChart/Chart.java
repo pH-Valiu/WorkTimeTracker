@@ -13,6 +13,7 @@ public class Chart {
 
         //Create and fill the table based on number of days needed
         table = new TimeSlot[daysOfSelectedWeek.size()][24];
+        table = new TimeSlot[7][24];
         for (int i = 0; i < table.length; i++) {
             for (int j = 0; j < table[i].length; j++) {
                 table[i][j] = new TimeSlot();

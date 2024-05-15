@@ -83,6 +83,10 @@ public class Date implements Comparable<Date> {
         return s;
     }
 
+    public int getWeekOfMonth(){
+        return (int) Math.ceil((day - getDayOfWeek()) / 7.0) + 1;
+    }
+
     /**
      * Use Zellers' method to calculate the day of the week
      * @return 1 -> Monday, 2 -> Tuesday, ...
@@ -134,6 +138,16 @@ public class Date implements Comparable<Date> {
             case 7: return "Sun";
         }
         return null;
+    }
+
+    public static int getFirstDayOfWeek(int year, int month, int week){
+        Date temp = new Date(year, month, 1);
+        for (int i = 1; i <= temp.getTotalDaysOfMonth(); i++) {
+            if(new Date(year, month, i).getWeekOfMonth() == week){
+                return i;
+            }
+        }
+        return 1;
     }
     
     public int getTotalDaysOfMonth(){

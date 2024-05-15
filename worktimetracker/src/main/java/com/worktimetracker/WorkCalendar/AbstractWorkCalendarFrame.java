@@ -2,12 +2,14 @@ package com.worktimetracker.WorkCalendar;
 
 import com.worktimetracker.DataClasses.Period;
 import com.worktimetracker.DataClasses.WorkSession;
+import com.worktimetracker.DataClasses.Date;
 import java.util.*;
 
 public abstract class AbstractWorkCalendarFrame {
     
-    public AbstractWorkCalendarFrame(List<WorkSession> sessions){
+    public AbstractWorkCalendarFrame(List<WorkSession> sessions, Date date){
         this.sessions = sessions;
+        this.date = date;
         this.mapSessionToWeek = new HashMap<>();
         //fill map <session - weekNr>
         for (WorkSession workSession : sessions) {
@@ -19,6 +21,7 @@ public abstract class AbstractWorkCalendarFrame {
 
     protected final List<WorkSession> sessions;
     protected final Map<WorkSession, Integer> mapSessionToWeek;
+    protected final Date date;
     public List<WorkSession> getSessions(){return sessions;}
 
     public static int calculateWeekNrBasedOnWeekAndMonth(int weekDay, int monthDay){

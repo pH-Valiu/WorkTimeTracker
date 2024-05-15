@@ -53,13 +53,20 @@ public class FileManager {
         }
     }
 
-    public List<WorkSession> getSessionsOfMonth() throws IOException, URISyntaxException{
+    public List<WorkSession> getSessionsOfMonth(int month) throws IOException, URISyntaxException{
         createFolderIfNotExist();
 
         //Get file of month
-        String fileName = DateTime.now().toString("YYYY-MM");
+        DateTime now = DateTime.now();
+        //set dateTime to get file from
+        DateTime dateTime = new DateTime(now.date().year(), month, now.date().day(), now.time().hours(), now.time().minutes(), now.time().seconds());
+
+        String fileName = dateTime.toString("YYYY-MM");
         Path file = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Months\\"+fileName);
         
+        if (!Files.exists(file)){
+            throw new IOException("Requested file does not exist: "+ fileName);
+        }
         //Read all lines
         List<String> lines = Files.readAllLines(file);
         
