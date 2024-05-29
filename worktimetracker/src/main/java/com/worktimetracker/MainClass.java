@@ -2,8 +2,11 @@ package com.worktimetracker;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.util.Optional;
 
 import com.worktimetracker.DataClasses.*;
+import com.worktimetracker.Export.ExportHandler;
 import com.worktimetracker.WorkCalendar.*;
 
 public class MainClass 
@@ -44,6 +47,24 @@ public class MainClass
                         }
                     }
                 }
+                case "export", "-export", "--export", "exp", "-exp", "--exp", "e" -> {
+                    if(args.length < 2){
+                        export(Optional.empty());
+                    }else{
+                        export(Optional.of(args[1]));
+                    }
+                }
+                case "exportCorrected", "-exportCorrected", "--exportCorrected", "expCor", "-expCor", "--expCor", "eC", "ec" -> {
+                    if(args.length < 2){
+                        exportCorrected(Optional.empty(), 40);
+                    }else{
+                        if (args.length < 3){
+                            exportCorrected(Optional.of(args[1]), 40);
+                        }else{
+                            exportCorrected(Optional.of(args[1]), Integer.parseInt(args[2]));
+                        }
+                    }
+                }
                 default -> System.out.println("Argument unkown. See --help for details regarding the usage.");
             }
         }
@@ -69,6 +90,13 @@ public class MainClass
                                         Each week 'part' will count as its own 'week'.
                                         You can specify which week of the current month to display. (Default: current week)
                                         You can also specify the month whose week to disply. (Default: current month)
+                    export <directory>  
+                                        Export the work time of the current month as .csv file.
+                                        You can specify where to put that file. (Default: Downloads folder) 
+                    exportCorrected <directory> <totalHours>
+                                        Export the corrected version of the work time of the current month as .csv file.
+                                        You can specify where to put that file. (Default: Downloads folder).
+                                        You can also specify how many work hours you should have had in the current month. (Default: 40)
                 """);
         System.out.println("----------------------------------------------------------");
     }
@@ -152,6 +180,28 @@ public class MainClass
             System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------");
         }catch (IOException | IllegalArgumentException | URISyntaxException e){
             System.out.println(ANSI_COLORS.ANSI_RED + e.getMessage() + ANSI_COLORS.ANSI_RESET);
+        }
+    }
+
+    private static void export(Optional<String> directory){
+        try{
+            DateTime now = DateTime.now();
+
+            new ExportHandler(fileManager.getSessionsOfMonth(now.date().month())).export(directory.map((s) -> Path.of(s)));
+        }catch(IOException | URISyntaxException e){
+            System.out.println(ANSI_COLORS.ANSI_RED + e.getMessage() + ANSI_COLORS.ANSI_RESET);
+
+        }
+    }
+
+    private static void exportCorrected(Optional<String> directory, int totalHours){
+        try{
+            DateTime now = DateTime.now();
+
+            new ExportHandler(fileManager.getSessionsOfMonth(now.date().month())).exportCorrected(directory.map(s -> Path.of(s)), totalHours);
+        }catch(IOException | URISyntaxException e){
+            System.out.println(ANSI_COLORS.ANSI_RED + e.getMessage() + ANSI_COLORS.ANSI_RESET);
+
         }
     }
 }

@@ -1,9 +1,9 @@
 package com.worktimetracker.WorkCalendar;
 
 import com.worktimetracker.ANSI_COLORS;
+import com.worktimetracker.Chart.WeekChart;
 import com.worktimetracker.DataClasses.*;
 import com.worktimetracker.DataClasses.Date;
-import com.worktimetracker.WeekChart.Chart;
 
 import java.util.*;
 
@@ -73,7 +73,7 @@ public class WorkWeek extends AbstractWorkCalendarFrame {
     }
 
     public String getDistributionChart(){
-        Chart chart = new Chart(daysOfWeekList);
+        WeekChart chart = new WeekChart(daysOfWeekList);
         String s = "";
         s += "───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\n";
         for (WorkSession workSession : mapSessionToWeek.keySet()) {

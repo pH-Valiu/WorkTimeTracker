@@ -29,6 +29,12 @@ public class Time extends Number implements Comparable<Time>{
         return new Time(Integer.valueOf(hours), Integer.valueOf(minutes), Integer.valueOf(seconds));
     }
 
+    public Time(Period period){
+        this.hours = period.hours();
+        this.minutes = period.minutes();
+        this.seconds = period.seconds();
+    }
+
     /**
      * hh for hours, mm for minutes, ss for seconds
      * @param format

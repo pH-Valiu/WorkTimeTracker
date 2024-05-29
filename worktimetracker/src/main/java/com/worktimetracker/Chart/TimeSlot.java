@@ -1,4 +1,4 @@
-package com.worktimetracker.WeekChart;
+package com.worktimetracker.Chart;
 
 import com.worktimetracker.ANSI_COLORS;
 

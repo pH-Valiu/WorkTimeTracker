@@ -1,18 +1,17 @@
-package com.worktimetracker.WeekChart;
+package com.worktimetracker.Chart;
 
 import java.util.List;
 
 import com.worktimetracker.DataClasses.*;
 
-public class Chart {
+public class WeekChart {
     private TimeSlot[][] table;
     private final List<Pair<Integer, Integer>> daysOfSelectedWeek;
 
-    public Chart(List<Pair<Integer, Integer>> daysOfSelectedWeek){
+    public WeekChart(List<Pair<Integer, Integer>> daysOfSelectedWeek){
         this.daysOfSelectedWeek = daysOfSelectedWeek;
 
         //Create and fill the table based on number of days needed
-        table = new TimeSlot[daysOfSelectedWeek.size()][24];
         table = new TimeSlot[7][24];
         for (int i = 0; i < table.length; i++) {
             for (int j = 0; j < table[i].length; j++) {

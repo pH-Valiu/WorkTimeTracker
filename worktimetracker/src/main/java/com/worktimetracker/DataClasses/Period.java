@@ -112,7 +112,13 @@ public record Period(int hours, int minutes, int seconds) implements Comparable<
      */
     @Override
     public String toString(){
-        return toString("hhh mmmin sssec", ANSI_COLORS.ANSI_WHITE);
+        return toString("hh:mm:ss");
+    }
+
+    public String toString(String format){
+        format = format.replace("ss", (String.valueOf(seconds).length() == 1 ? "0"+String.valueOf(seconds) : String.valueOf(seconds)));
+        format = format.replace("mm", (String.valueOf(minutes).length() == 1 ? "0"+String.valueOf(minutes) : String.valueOf(minutes)));
+        return format.replace("hh", (String.valueOf(hours).length() == 1 ? "0"+String.valueOf(hours) : String.valueOf(hours)));
     }
 
     /**

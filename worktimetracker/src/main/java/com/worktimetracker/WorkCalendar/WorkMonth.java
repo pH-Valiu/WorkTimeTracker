@@ -3,6 +3,7 @@ package com.worktimetracker.WorkCalendar;
 import java.util.List;
 
 import com.worktimetracker.ANSI_COLORS;
+import com.worktimetracker.Chart.MonthChart;
 import com.worktimetracker.DataClasses.Date;
 import com.worktimetracker.DataClasses.Period;
 import com.worktimetracker.DataClasses.WorkSession;
@@ -166,5 +167,16 @@ public class WorkMonth extends AbstractWorkCalendarFrame{
         }
         s += ANSI_COLORS.ANSI_CYAN+" <- Optimal Distribution"+ANSI_COLORS.ANSI_RESET;
         return s;
+    }
+
+
+    public MonthChart getChart(){
+        MonthChart chart = new MonthChart(date);
+
+        for (int i = 0; i < sessions.size(); i++) {
+            chart.addPeriod(sessions.get(i).start(), Period.getPeriod(sessions.get(i).start().time(), sessions.get(i).end()));
+        }
+
+        return chart;
     }
 }
