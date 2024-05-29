@@ -18,10 +18,14 @@ public record WorkSession(DateTime start, Time end) {
     }
 
     public String toCSVString(){
-        return start.toString("YYYY-MM-DD")+","+
-        start.toString("hh:mm")+","+
-        end.toString("hh:mm")+","+
-        getWorkTime().toString("hhh mmm");
+        if(Period.getPeriod(start.time(), end).isZero()){
+            return null;
+        }else{
+            return start.toString("YYYY-MM-DD")+","+
+            start.toString("hh:mm")+","+
+            end.toString("hh:mm")+","+
+            getWorkTime().toString("hhh mmm");
+        }
     }
     
 }

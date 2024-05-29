@@ -3,6 +3,12 @@ package com.worktimetracker.DataClasses;
 import com.worktimetracker.ANSI_COLORS;
 
 public record Period(int hours, int minutes, int seconds) implements Comparable<Period>{
+    
+    
+    public static Period of(Period period) {
+        return new Period(period.hours, period.minutes, period.seconds);
+    }
+
     /**
      * Returns the time period between two {@link Time} points
      * @param t1
@@ -28,6 +34,7 @@ public record Period(int hours, int minutes, int seconds) implements Comparable<
         return new Period(hours, minutes, seconds);
     }
 
+    public static Period empty(){return new Period(0, 0, 0);}
 
     /**
      * Static constructor to get Period object from total seconds count
@@ -69,7 +76,7 @@ public record Period(int hours, int minutes, int seconds) implements Comparable<
      * @param other
      * @return the subtraction object
      */
-    public Period minus(Period other){
+    public Period differenceBetween(Period other){
         int h1 = this.hashCode();
         int h2 = other.hashCode();
         int res;
@@ -95,9 +102,25 @@ public record Period(int hours, int minutes, int seconds) implements Comparable<
 
         return Period.fromSeconds(res);
     }
+    
+
+    /**
+     * This method can return a Period with negative period 
+     * @param other
+     * @return
+     */
+    public Period minus(Period other){
+        return Period.fromSeconds(this.hashCode() - other.hashCode());
+    }
 
     public Period divideBy(int divisor){
         long totalSecondsFraction = this.hashCode() / divisor;
+
+        return Period.fromSeconds(totalSecondsFraction);
+    }
+
+    public Period multiplyBy(int multiplier){
+        long totalSecondsFraction = this.hashCode() * multiplier;
 
         return Period.fromSeconds(totalSecondsFraction);
     }

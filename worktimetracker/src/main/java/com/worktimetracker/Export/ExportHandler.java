@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import com.worktimetracker.DataClasses.DateTime;
+import com.worktimetracker.DataClasses.Pair;
 import com.worktimetracker.DataClasses.Period;
 import com.worktimetracker.DataClasses.Time;
 import com.worktimetracker.DataClasses.Date;
@@ -24,14 +25,32 @@ public record ExportHandler(List<WorkSession> workSessions) {
         sb.append("Tag,Zeitraum von,Bis,Zeit\n");
 
         List<Date> workDays = getWorkDaysOfMonth();
-        Period perDayWorkLoad = new Period(totalHours, 0, 0).divideBy(workDays.size());
+        Period totalWorkLoad = new Period(totalHours, 0, 0);
+        Random rnd = new Random();
 
-        List<WorkSession> sessions = workDays.stream().map((date) -> 
-            new WorkSession(
-                new DateTime(date, new Time(8, 0, 0)), 
-                new Time(perDayWorkLoad).plusTime(8, 0, 0))).toList();
+        Map<Integer, WorkSession> sessions = new HashMap<>();
+    
+        while(!totalWorkLoad.isZero()){
+            for (int i = 0; i < workDays.size(); i++) {
+                Pair<Period, Period> pair = randomSubset(totalWorkLoad, totalWorkLoad.divideBy(workDays.size()).hours() + 2, 15);
+                totalWorkLoad = pair.first();
+    
+                int startOffset = 8 + rnd.nextInt(3);
+                
+                WorkSession ses = sessions.get(i);
+                if(ses != null){
+                    sessions.put(i, new WorkSession(
+                        ses.start(), 
+                        ses.end().plusTime(pair.second().hours(), pair.second().minutes(), pair.second().seconds())));
+                }else{
+                    sessions.put(i, new WorkSession(
+                        new DateTime(workDays.get(i), new Time(startOffset, 0, 0)), 
+                        new Time(pair.second()).plusTime(startOffset, 0, 0)));
+                }
+            }
+        }
 
-        writeToFile(path, sessions);
+        writeToFile(path, sessions.entrySet().stream().map(it -> it.getValue()).toList());
     }
 
 
@@ -55,7 +74,10 @@ public record ExportHandler(List<WorkSession> workSessions) {
         sb.append("Tag,Zeitraum von,Bis,Zeit\n");
 
         for (WorkSession workSession : workSessions) {
-            sb.append(workSession.toCSVString()).append("\n");
+            String csv = workSession.toCSVString();
+            if(csv != null){
+                sb.append(workSession.toCSVString()).append("\n");
+            }
         }
 
         File outputFile = path.orElse(Path.of(System.getProperty("user.home")+File.separator+"Downloads"+File.separator+"export"+DateTime.now().toString("YYYY-MM")+".csv")).toFile();
@@ -63,6 +85,20 @@ public record ExportHandler(List<WorkSession> workSessions) {
         writer.append(sb.toString());
         writer.flush();
         writer.close();
-        System.out.println(sb.toString());
+        //System.out.println(sb.toString());
+    }
+
+    private Pair<Period, Period> randomSubset(Period base, int maxHours, int minutesInterval){
+        Random rnd = new Random();
+        int offsetHours = rnd.nextInt(maxHours);
+        int offsetMinutes = rnd.nextInt(3) * minutesInterval;
+
+        Period subset = new Period(offsetHours, offsetMinutes, 0);
+        if ( base.compareTo(subset) >= 0){
+            Period newRemaining = base.minusWithLowerEnd(subset);
+            return new Pair<>(newRemaining, subset);
+        }else{
+            return new Pair<>(new Period(0,0,0), base);
+        }
     }
 }
