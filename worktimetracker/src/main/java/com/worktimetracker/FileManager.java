@@ -65,7 +65,7 @@ public class FileManager {
      * @throws URISyntaxException
      */
     public List<WorkSession> getSessionsOfMonth(String project, int month, int year) throws IOException, URISyntaxException{
-        createProjectFolderIfNotExist(project);
+        if (!checkIfProjectExists(project)) throw new IOException("Requested project does not exist: "+project);
 
         //Get file of month
         DateTime now = DateTime.now();
@@ -114,6 +114,9 @@ public class FileManager {
 
     //helper functions
 
+    private boolean checkIfProjectExists(String projectName) throws URISyntaxException{
+        return listAllProjects().contains(projectName);
+    }
 
 
     private void createProjectFolderIfNotExist(String projectName) throws IOException, URISyntaxException{
@@ -130,7 +133,7 @@ public class FileManager {
      * @throws URISyntaxException
      */
     private Optional<String> getNewestFile(String projectName) throws IOException, URISyntaxException   {
-        createProjectFolderIfNotExist(projectName);
+        if (!checkIfProjectExists(projectName)) throw new IOException("Requested project does not exist: "+projectName);
         
         // "/Month" folder as File object
         File folder = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Projects\\" + projectName + "\\Months\\").toFile();
