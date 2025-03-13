@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -19,12 +20,12 @@ import com.worktimetracker.DataClasses.WorkSession;
 
 public class FileManager {
     
-    public void storeStart(DateTime starDateTime) throws IOException, URISyntaxException{
-        createFolderIfNotExist();
+    public void storeStart(String project, DateTime starDateTime) throws IOException, URISyntaxException{
+        createProjectFolderIfNotExist(project);
 
         //Get (and or create if necessary) the save file
         String fileName = starDateTime.toString("YYYY-MM");
-        Path monthsFilePath = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Months\\"+fileName);
+        Path monthsFilePath = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Projects\\" + project + "\\Months\\"+fileName);
         
         //write into file "\nYYYY-MM-DD hh:mm:ss"
         BufferedWriter writer = new BufferedWriter(new FileWriter(monthsFilePath.toString(), true));
@@ -34,16 +35,16 @@ public class FileManager {
         writer.close();
     }
     
-    public void storeEnd(Time end) throws IOException, URISyntaxException{
+    public void storeEnd(String project, Time end) throws IOException, URISyntaxException{
         //try to get the newest, most recently used file
-        Optional<String> file = getNewestFile();
+        Optional<String> file = getNewestFile(project);
 
         //assure that it has been found
         if(file.isEmpty()){
             throw new IOException("No file found. Please start the timer first.");
         }else{
             //Get the file
-            Path monthsFilePath = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Months\\"+file.get());
+            Path monthsFilePath = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Projects\\" + project + "\\Months\\"+file.get());
             
             //Append to file "Ohh:mm:ss"
             BufferedWriter writer = new BufferedWriter(new FileWriter(monthsFilePath.toString(), true));
@@ -53,8 +54,8 @@ public class FileManager {
         }
     }
 
-    public List<WorkSession> getSessionsOfMonth(int month) throws IOException, URISyntaxException{
-        createFolderIfNotExist();
+    public List<WorkSession> getSessionsOfMonth(String project, int month) throws IOException, URISyntaxException{
+        createProjectFolderIfNotExist(project);
 
         //Get file of month
         DateTime now = DateTime.now();
@@ -62,7 +63,7 @@ public class FileManager {
         DateTime dateTime = new DateTime(now.date().year(), month, now.date().day(), now.time().hours(), now.time().minutes(), now.time().seconds());
 
         String fileName = dateTime.toString("YYYY-MM");
-        Path file = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Months\\"+fileName);
+        Path file = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Projects\\" + project + "\\Months\\" + fileName);
         
         if (!Files.exists(file)){
             throw new IOException("Requested file does not exist: "+ fileName);
@@ -81,26 +82,48 @@ public class FileManager {
         return workSessions;
     }
 
+    /**
+     * Searches the 'Projects' directory for all projects
+     * @return a list of all projects as their names
+     * @throws URISyntaxException if code domain location could not be found
+     */
+    public List<String> listAllProjects() throws URISyntaxException{
+        Path projectsFolder = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Projects");
+        File folder = projectsFolder.toFile();
+        
+        List<String> projectNames = new ArrayList<>();
+        if (folder.exists() && folder.isDirectory()) {
+            for (File file : Objects.requireNonNull(folder.listFiles())) {
+                if (file.isDirectory()) {
+                    projectNames.add(file.getName());
+                }
+            }
+        }
+        return projectNames;
+    }
 
     //helper functions
 
-    private void createFolderIfNotExist() throws IOException, URISyntaxException{
-        Path folder = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Months");
+
+
+    private void createProjectFolderIfNotExist(String projectName) throws IOException, URISyntaxException{
+        Path folder = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Projects\\"+projectName+"\\Months");
         Files.createDirectories(folder);
     }
 
     /**
-     * This method tries to get the newest save file.
+     * This method tries to get the newest save file of given project.
      * It retrieves all filenames and sorts them based on their name
+     * @param projectName the name of the project to search through
      * @return Optional containing the name of the file if there was one to begin with
      * @throws IOException
      * @throws URISyntaxException
      */
-    private Optional<String> getNewestFile() throws IOException, URISyntaxException   {
-        createFolderIfNotExist();
+    private Optional<String> getNewestFile(String projectName) throws IOException, URISyntaxException   {
+        createProjectFolderIfNotExist(projectName);
         
         // "/Month" folder as File object
-        File folder = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Months").toFile();
+        File folder = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Projects\\" + projectName + "\\Months\\").toFile();
         
         //Stream the fileNames of all files in the folder
         //Sort them based on following directive
