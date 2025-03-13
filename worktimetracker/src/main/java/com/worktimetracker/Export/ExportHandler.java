@@ -19,12 +19,12 @@ public record ExportHandler(List<WorkSession> workSessions) {
         writeToFile(path, workSessions);
     }
     
-    public void exportCorrected(Optional<Path> path, int totalHours) throws IOException{
+    public void exportCorrected(Optional<Path> path, int totalHours, int month, int year) throws IOException{
         StringBuilder sb = new StringBuilder();
         sb.append("sep=,\n");
         sb.append("Tag,Zeitraum von,Bis,Zeit\n");
 
-        List<Date> workDays = getWorkDaysOfMonth();
+        List<Date> workDays = getWorkDaysOfMonth(Optional.of(new Date(year, month, 1)));
         Period totalWorkLoad = new Period(totalHours, 0, 0);
         Random rnd = new Random();
 
@@ -54,14 +54,14 @@ public record ExportHandler(List<WorkSession> workSessions) {
     }
 
 
-    private List<Date> getWorkDaysOfMonth(){
-        DateTime now = DateTime.now();
+    private List<Date> getWorkDaysOfMonth(Optional<Date> date){
+        Date base = date.orElse(DateTime.now().date());
         List<Date> dates = new ArrayList<>();
 
-        for (int i = 0; i < now.date().getTotalDaysOfMonth(); i++) {
-            Date date = new Date(now.date().year(), now.date().month(), i+1);
-            if(date.getDayOfWeek() <= 5 ){
-                dates.add(date);
+        for (int i = 0; i < base.getTotalDaysOfMonth(); i++) {
+            Date d = new Date(base.year(), base.month(), i+1);
+            if(d.getDayOfWeek() <= 5 ){
+                dates.add(d);
             }
         }
 

@@ -54,13 +54,23 @@ public class FileManager {
         }
     }
 
-    public List<WorkSession> getSessionsOfMonth(String project, int month) throws IOException, URISyntaxException{
+    /**
+     * This is a super important method as it searches the system for the "Month"-file of a certain project.
+     * The parameters for month and year further describe which one to take
+     * @param project the project to search in
+     * @param month the month to query
+     * @param year the yaer to query
+     * @return List containing all work sessions in that month
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public List<WorkSession> getSessionsOfMonth(String project, int month, int year) throws IOException, URISyntaxException{
         createProjectFolderIfNotExist(project);
 
         //Get file of month
         DateTime now = DateTime.now();
         //set dateTime to get file from
-        DateTime dateTime = new DateTime(now.date().year(), month, now.date().day(), now.time().hours(), now.time().minutes(), now.time().seconds());
+        DateTime dateTime = new DateTime(year, month, now.date().day(), now.time().hours(), now.time().minutes(), now.time().seconds());
 
         String fileName = dateTime.toString("YYYY-MM");
         Path file = Path.of(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\Projects\\" + project + "\\Months\\" + fileName);
