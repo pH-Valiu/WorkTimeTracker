@@ -133,14 +133,19 @@ public class MainClass
 
                 Commands:
                     help                Shows this page
+
                     list                List all current active projects
+
                     start <project>     Start a work session for given project
+
                     stop <project>      Stop the current work session for given project
+                    
                     month <project> <maxHours> <month> <year>
                                         Display the stats of the current month for given project.
                                         You can specify how many hours you want to work in total. (Default: 40)
                                         You can specify which month to display. (Default: current month)
                                         You can specify the year whose month to display. (Default: current year)
+
                     week <project> <maxHours> <weekOfMonth> <month> <year>
                                         Display the stats of the current week for given project.
                                         You can specify how many hours you want to work in total. (Default 10)
@@ -149,11 +154,13 @@ public class MainClass
                                         You can specify which week of the current month to display. (Default: current week)
                                         You can specify the month whose week to disply. (Default: current month)
                                         You can specify the year whose month to display. (Default: current year)
+
                     export <project> <directory> <month> <year>
                                         Export the work time of the current month for given project as .csv file.
                                         You can specify where to put that file. (Default: Downloads folder) 
                                         You can specify the month to export. (Default: current month)
                                         You can specify the year whose month to export. (Default: current year)
+
                     exportCorrected <project> <directory> <totalHours> <month> <year>
                                         Export the corrected version of the work time of the current month for given project as .csv file.
                                         You can specify where to put that file. (Default: Downloads folder).
