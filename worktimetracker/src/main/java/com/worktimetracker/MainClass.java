@@ -128,13 +128,14 @@ public class MainClass
         System.out.println("------------------- Work Time Tracker --------------------\n");
         System.out.println("""
                 This is a tool to assist you in keeping track of your work time to not create overtime.
+                When calling 'start' and adding a project name, a new project will automatically be created
                 The field <project> is mandatary for all commands which list that field.
 
                 Commands:
                     help                Shows this page
+                    list                List all current active projects
                     start <project>     Start a work session for given project
                     stop <project>      Stop the current work session for given project
-                    list                List all current active projects
                     month <project> <maxHours> <month> <year>
                                         Display the stats of the current month for given project.
                                         You can specify how many hours you want to work in total. (Default: 40)
