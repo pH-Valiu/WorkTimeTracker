@@ -1,3 +1,98 @@
+# WorkTimeTracker
+## Goal
+Having a digital semi-automatic method to tracking your time spent working.
+
+## What we offer
+A simple Java command line based tool to keep track of your spent time on different projects.
+
+## Getting started
+Please first follow the installation guide.
+
+### Starting
+After you completed installation, to start tracking your time, call:
+```sh
+wtt start <project_name>
+```
+This starts tracking the time for your project. 
+It will create a new project if there did not exist one so far.
+
+### Stopping
+To stop the tracking, call:
+```sh
+wtt stop <project_name>
+```
+
+### List projects
+To display all projects, call:
+```sh
+wtt list
+```
+(or `wtt -l` `wtt --l`)
+
+### Display worked time
+You have two options to display the time you have worked.
+Either display the time for a specific month or for a specific week:
+
+#### Month
+Call:
+```sh
+wtt month <project_name>
+```
+to get a visual representation of how much you have worked this month in each week.<br>
+To specify a destined work amount, add it in the command as an argument. The default is 40 hours.
+
+You will see the optimal time distribution for each week for the destined work amount as well as the optimal distribution for each week for the remaining hours until you have reached your work goal.
+
+The syntax for this command is:
+```sh
+wtt month <project_name> <hoursGoal> <month> <year>
+```
+The last two arguments allow you to further specify which month of which year to display.
+
+#### Week
+Call:
+```sh
+wtt week <project_name>
+```
+to get a visual representation of how much and when you have worked this week at each day.<br>
+To specify a destined work amount, add it in the command as an argument. The default is 10 hours.
+
+You will see the optimal time distribution for each day for the destined work amount as well as the optimal distribution for each day for the remaining hours until you have reached your work goal.
+
+The syntax for this command is:
+```sh
+wtt week <project_name> <hoursGoal> <weekOfMonth> <month> <year>
+```
+The last three arguments allow you to further specify which week of with month of which year to display.
+The `weekOfMonth` argument is a number between 1 and 6.
+
+
+### Exporting data
+We offer two export variants. Both export the data in a `.csv` format, ready to be inserted in a Excel sheet.
+
+#### True Export
+Call:
+```sh
+wtt export <project_name>
+```
+to create a true export of your worked time
+
+
+#### Corrected Export
+Call:
+```sh
+wtt exportCorrected <project_name> <fileToStoreIn> <totalHours>
+```
+to create a faked export of your destined work time defined by the `totalHours` argument.
+This will make sure that you have only worked on weekdays between 8am - 6pm.
+
+## Help
+Following is the complete `--help` output:
+We further support many aliases for most commands, like:
+- `eC` for `exportCorrected`
+- `e` for `export`
+- `l` for `list`
+
 ```
 This is a tool to assist you in keeping track of your work time to not create overtime.
 When calling 'start' and adding a project name, a new project will automatically be created
